@@ -12,7 +12,7 @@ export class EvaluatorService {
    * @param input Input
    * @returns array with numbers and operands
    */
-  private extractNumbersAndOperands(input: string): (string | number)[] {
+  private extractNumbersAndOperands(input: string): number | string {
     let iterator = 0;
     const chars = [];
 
@@ -51,10 +51,10 @@ export class EvaluatorService {
       }
 
       // If the character can't recognize, throw an error
-      throw new Error(`Invalid char ${char} at position ${iterator}`);
+      return `Invalid char ${char} at position ${iterator}`;
     }
 
-    return chars;
+    return this.convertInfixToPostfix(chars);
   }
 
   /**
@@ -63,7 +63,7 @@ export class EvaluatorService {
    * @param chars chars
    * @returns transformed postfix array of chars
    */
-  private convertInfixToPostfix(chars: (string | number)[]) {
+  private convertInfixToPostfix(chars: (string | number)[]): number | string {
     const operators: string[] = [];
     const postfixArray: any[] = [];
 
@@ -79,7 +79,7 @@ export class EvaluatorService {
       // if char is an operator check if there are oeprators in operators stack
       // with higher precedence than current one, if yes remove from operators and
       // add it to postfix array and then push current token to operators
-      if (/[+\-/*<>=^]/.test(char)) {
+      if (/[+\-/*]/.test(char)) {
         while (this.checkEqualOrHigherPrecedence(operators, char)) {
           postfixArray.push(operators.pop());
         }
@@ -103,14 +103,14 @@ export class EvaluatorService {
         continue;
       }
 
-      throw new Error(`Unparsed char ${char} at position ${i}`);
+      return `Unparsed char ${char} at position ${i}`;
     }
 
     for (let i = operators.length - 1; i >= 0; i--) {
       postfixArray.push(operators[i]);
     }
 
-    return postfixArray;
+    return this.evaluateExpression(postfixArray);
   }
 
   /**
@@ -132,7 +132,61 @@ export class EvaluatorService {
     return precedence[lastOperator] >= precedence[nextChar];
   }
 
+  /**
+   * Check whether top operator in operators has a higher or equal prescedence of nextChar
+   *
+   * @param postfixArray Operators
+   * @returns should be removed or not
+   */
+  private evaluateExpression(postfixArray: any[]): number | string {
+    const stack: any = [];
+
+    for (let i = 0; i < postfixArray.length; i++) {
+      const char = postfixArray[i];
+
+      // if it is an operator execute operation and add the result in stack
+      if (/[+\-/*]/.test(char)) {
+        stack.push(this.operate(char, stack));
+        continue;
+      }
+
+      // if it is number push it to stack
+      if (typeof char === 'number') {
+        stack.push(char);
+        continue;
+      }
+      return `Invalid char ${char}`;
+    }
+
+    // return actual stack which is the result of the evaluation
+    return stack.pop();
+  }
+
   evaluate(input: string): any {
-    return this.convertInfixToPostfix(this.extractNumbersAndOperands(input));
+    return this.extractNumbersAndOperands(input);
+  }
+
+  /**
+   * Returns the result of appyling the mathematical operator on the stack.
+   * @param operator Operators
+   * @param stack Operators
+   * @returns should be removed or not
+   */
+  private operate(operator: string, stack: any) {
+    const b = stack.pop();
+    const a = stack.pop();
+
+    switch (operator) {
+      case '+':
+        return a + b;
+      case '-':
+        return a - b;
+      case '*':
+        return a * b;
+      case '/':
+        return a / b;
+      default:
+        throw new Error(`Invalid operator: ${operator}`);
+    }
   }
 }
