@@ -1,7 +1,7 @@
 /**
  * Expression model
  */
-export interface ExpressionModel {
+export interface Expression {
   /**
    * Expression
    */

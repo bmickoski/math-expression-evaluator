@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ExpressionModel } from '../models/expression.model';
+import { Expression } from '../models/expression.model';
 
 /**
  * Name of localstorage property to store Expressions
@@ -18,7 +18,7 @@ export class ExpressionStorage {
    *
    * @param expression New expression
    */
-  setExpression(expression: ExpressionModel): void {
+  setExpression(expression: Expression): void {
     const existingExpressions = this.getExpressions();
     if (existingExpressions.length > 0) {
       if (existingExpressions.length === 5) {

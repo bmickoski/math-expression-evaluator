@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 import { CalculatorComponent } from './components/calculator/calculator.component';
+import { SuprCalculatorComponent } from './components/supr-calculator/supr-calculator.component';
 
 /**
  * Define application root routes
@@ -12,6 +13,10 @@ import { CalculatorComponent } from './components/calculator/calculator.componen
       {
         path: '',
         component: CalculatorComponent,
+      },
+      {
+        path: 'supr-calculator',
+        component: SuprCalculatorComponent,
       },
     ]),
   ],

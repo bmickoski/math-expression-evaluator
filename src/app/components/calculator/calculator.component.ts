@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { EvaluatorService } from '../../services/evaluator.service';
-import { ExpressionModel } from '../../models/expression.model';
+import { Expression } from '../../models/expression.model';
 import { ExpressionStorage } from '../../services/expression-storage';
 
 @Component({
@@ -28,7 +28,7 @@ export class CalculatorComponent implements OnInit {
   /**
    * User expression
    */
-  expressions: ExpressionModel[] = [];
+  expressions: Expression[] = [];
 
   /**
    * User expression

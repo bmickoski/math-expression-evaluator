@@ -12,7 +12,7 @@ export class EvaluatorService {
    * @param input Input
    * @returns array with numbers and operands
    */
-  private extractNumbersAndOperands(input: string): number | string {
+  extractNumbersAndOperands(input: string): number | string {
     let iterator = 0;
     const chars = [];
 

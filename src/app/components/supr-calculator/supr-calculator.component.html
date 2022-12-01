@@ -1,0 +1,58 @@
+<div class="container-fluid px-3">
+  <div class="row py-3">
+    <div
+      class="col-xxl-2 col-lg-3 col-md-4 col-sm-6 mx-auto bg-dark rounded-3 shadow-sm p-3"
+    >
+      <input
+        type="text"
+        [(ngModel)]="displayValue"
+        class="form-control form-control-lg text-success"
+        readonly
+      />
+      <div class="row g-0 text-center mt-2">
+        <div class="col-auto text-white">
+          <div class="row g-1 g-lg-1">
+            <div *ngFor="let key of keypad" class="ms-auto col-3 py-2">
+              <button
+                class="btn text-white w-100"
+                ngClass="{{ key.color }}"
+                (click)="processKey(key.value)"
+              >
+                {{ key.label }}
+              </button>
+            </div>
+            <div class="col-12 pt-2">
+              <div class="row">
+                <div class="col-6">
+                  <button
+                    class="btn btn-success border-secondary btn-lg text-white w-100 fw-bold"
+                    (click)="onRandomNumber()"
+                  >
+                    RAND
+                  </button>
+                </div>
+                <div class="col-6">
+                  <button
+                    class="btn btn-warning border-secondary btn-lg text-white w-100 fw-bold"
+                    (click)="evaluate()"
+                  >
+                    =
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div
+                *ngIf="errValue"
+                class="alert alert-warning p-2 text-truncate small"
+                role="alert"
+              >
+                {{ errValue }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
