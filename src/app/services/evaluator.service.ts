@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 const precedence: any = { '*': 1, '/': 1, '+': 0, '-': 0 };
 const leftParenthesis = '(';
 const rightParenthesis = ')';
+const functions = ['sin', 'cos', 'tan'];
 
 @Injectable({ providedIn: 'root' })
 export class EvaluatorService {
@@ -43,6 +44,24 @@ export class EvaluatorService {
         continue;
       }
 
+      // If the character is the first character of a name,
+      // like the name of a function or variable or variable pointer
+      if (/[a-z]/.test(char)) {
+        // Create a string to hold all the characters in the name
+        let name = '';
+
+        // While we have more characters that make up the name and we haven't
+        // gotten to the end of the input...
+        while (iterator < input.length && /[a-z]/.test(input[iterator])) {
+          // Collect all the characters in the name
+          name += input[iterator++];
+        }
+
+        // Then push the full name to the array of tokens
+        chars.push(name);
+        continue;
+      }
+
       // If the character is white space...
       if (char === ' ') {
         // Ignore it
@@ -79,7 +98,7 @@ export class EvaluatorService {
       // if char is an operator check if there are oeprators in operators stack
       // with higher precedence than current one, if yes remove from operators and
       // add it to postfix array and then push current token to operators
-      if (/[+\-/*]/.test(char)) {
+      if (/[+\-/*a-z]/.test(char)) {
         while (this.checkEqualOrHigherPrecedence(operators, char)) {
           postfixArray.push(operators.pop());
         }
@@ -129,7 +148,10 @@ export class EvaluatorService {
     }
 
     const lastOperator = operators[operators.length - 1];
-    return precedence[lastOperator] >= precedence[nextChar];
+    return (
+      /[a-z]/.test(lastOperator) ||
+      precedence[lastOperator] >= precedence[nextChar]
+    );
   }
 
   /**
@@ -147,6 +169,13 @@ export class EvaluatorService {
       // if it is an operator execute operation and add the result in stack
       if (/[+\-/*]/.test(char)) {
         stack.push(this.operate(char, stack));
+        continue;
+      }
+
+      // If the token is a function name...
+      if (/^[a-z]/.test(char)) {
+        // Apply the function on the stack and push the result to the stack
+        stack.push(this.applyFnc(char, stack));
         continue;
       }
 
@@ -186,7 +215,7 @@ export class EvaluatorService {
       case '/':
         return a / b;
       default:
-        throw new Error(`Invalid operator: ${operator}`);
+        return `Invalid operator: ${operator}`;
     }
   }
 
@@ -198,7 +227,9 @@ export class EvaluatorService {
    */
   validateExpression(input: string): boolean {
     let iterator = 0;
-
+    let opening = ['('];
+    let closing = [')'];
+    const braces = [];
     while (iterator < input.length) {
       const char = input[iterator];
 
@@ -215,9 +246,32 @@ export class EvaluatorService {
         continue;
       }
 
+      // If the character is the first character of a function name
+      // create function name to hold all chars and check if that function
+      // is defined in allowed functions
+      if (/[a-z]/.test(char)) {
+        let name = '';
+
+        // While we have more characters that make up the name and we haven't
+        // gotten to the end of the input...
+        while (iterator < input.length && /[a-z]/.test(input[iterator])) {
+          // Collect all the characters in the name
+          name += input[iterator++];
+        }
+
+        if (functions.includes(name)) {
+          continue;
+        } else {
+          return false;
+        }
+      }
+
       if (/[+\-/*(),]/.test(char)) {
+        if (char === leftParenthesis || char === rightParenthesis) {
+          braces.push(char);
+        }
         // if expression ends with operand return false
-        if (iterator === input.length - 1) {
+        if (iterator === input.length - 1 && char !== rightParenthesis) {
           return false;
         }
         iterator++;
@@ -235,6 +289,63 @@ export class EvaluatorService {
       return false;
     }
 
-    return true;
+    if (braces.length > 0) {
+      return this.checkForClosingParenthesis(braces, opening, closing);
+    } else {
+      return true;
+    }
+  }
+
+  /**
+   * Check if all open parenthesis are closed
+   *
+   * @param braces Braces
+   * @param opening Opening braces
+   * @param closing Closing braces
+   * @returns all parenthesis closed or not
+   */
+  checkForClosingParenthesis(
+    braces: string[],
+    opening: string[],
+    closing: string[]
+  ): boolean {
+    let arr = [];
+    for (let i = 0; i < braces.length; i++) {
+      if (opening.includes(braces[i])) {
+        arr.push(braces[i]);
+      } else if (
+        closing.indexOf(braces[i]) === opening.indexOf(arr[arr.length - 1])
+      ) {
+        arr.pop();
+      } else return false;
+    }
+    return arr.length === 0;
+  }
+
+  /**
+   * Returns the result of applying the function onto the stack.
+   * The function arguments are in right-to-left order in the stack
+   *
+   * @param funcName Function name
+   * @param stack Opening braces
+   * @returns match calculation
+   */
+  applyFnc(funcName: string, stack: any) {
+    if (funcName === 'sin') {
+      const a = stack.pop();
+      return Math.sin(a);
+    }
+
+    if (funcName === 'cos') {
+      const a = stack.pop();
+      return Math.cos(a);
+    }
+
+    if (funcName === 'tan') {
+      const a = stack.pop();
+      return Math.tan(a);
+    }
+
+    return `Undefined function: ${funcName}`;
   }
 }
