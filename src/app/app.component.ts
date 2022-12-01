@@ -12,7 +12,7 @@ export class AppComponent implements OnInit {
 
   constructor(private evaluatorService: EvaluatorService) {}
   ngOnInit(): void {
-    console.log(this.evaluatorService.evaluate(this.expression));
-    console.log(this.evaluatorService.evaluate(this.invalidExpression));
+    // console.log(this.evaluatorService.evaluate(this.expression));
+    // console.log(this.evaluatorService.evaluate(this.invalidExpression));
   }
 }

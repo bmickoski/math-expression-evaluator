@@ -189,4 +189,52 @@ export class EvaluatorService {
         throw new Error(`Invalid operator: ${operator}`);
     }
   }
+
+  /**
+   * Extract numbers and operands in array
+   *
+   * @param input Input
+   * @returns array with numbers and operands
+   */
+  validateExpression(input: string): boolean {
+    let iterator = 0;
+
+    while (iterator < input.length) {
+      const char = input[iterator];
+
+      // If the character is a number...
+      if (/[0-9]/.test(char)) {
+        // Create a string to hold all the digits in the number
+        let digits = '';
+
+        // While we have more digits (or a period) in the number and we haven't
+        // gotten to the end of the input...
+        while (iterator < input.length && /[0-9\.]/.test(input[iterator])) {
+          digits += input[iterator++];
+        }
+        continue;
+      }
+
+      if (/[+\-/*(),]/.test(char)) {
+        // if expression ends with operand return false
+        if (iterator === input.length - 1) {
+          return false;
+        }
+        iterator++;
+        continue;
+      }
+
+      // If the character is white space...
+      if (char === ' ') {
+        // Ignore it
+        iterator++;
+        continue;
+      }
+
+      // If the character can't recognize, throw an error
+      return false;
+    }
+
+    return true;
+  }
 }

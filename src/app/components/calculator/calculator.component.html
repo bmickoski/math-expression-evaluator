@@ -1,0 +1,56 @@
+<div class="justify-content-center align-items-center mt-5 ms-5 me-5">
+  <div class="input-group mb-3">
+    <input
+      (ngModelChange)="onExpressionChange($event)"
+      [(ngModel)]="userExpression"
+      type="text"
+      class="form-control"
+      id="expressionInput"
+      placeholder="Enter your expression..."
+    />
+    <button
+      class="btn btn-outline-secondary"
+      type="button"
+      id="evaluate"
+      (click)="evaluateExpression()"
+    >
+      Evaluate
+    </button>
+  </div>
+  <div class="input-group" *ngIf="!isValid && expressionSubmitted">
+    <div
+      class="w-100 alert alert-danger alert-dismissible fade show"
+      role="alert"
+    >
+      <strong>Invalid Expression!</strong>
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Close"
+        (click)="expressionSubmitted = false"
+      ></button>
+    </div>
+  </div>
+  <div class="input-group" *ngIf="isValid && expressionSubmitted">
+    <div
+      class="w-100 alert alert-success alert-dismissible fade show"
+      role="alert"
+    >
+      <strong>Evalauted expression: </strong> - {{ result }}
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Close"
+      ></button>
+    </div>
+  </div>
+  <div class="input-group" *ngIf="expressions.length > 0">
+    <ol class="list-group list-group-flush">
+      <li class="list-group-item" *ngFor="let exp of expressions">
+        Expression: {{ exp.expression }} Result: {{ exp.result }}
+      </li>
+    </ol>
+  </div>
+</div>
